@@ -1,0 +1,54 @@
+version: "3"
+services:
+
+  postgres:
+    image: postgres:10.1-alpine
+    container_name: postgres
+    hostname: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - /home/manu/borges-pipeline/volumes/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=testing
+      - POSTGRES_USER=testing
+      - POSTGRES_PASSWORD=testing
+
+  rabbit:
+    image: rabbitmq:3.7.3-management-alpine
+    container_name: rabbit
+    hostname: rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  namenode:
+    image: uhopper/hadoop-namenode:2.7.2
+    hostname: namenode
+    container_name: namenode
+    domainname: hadoop
+    networks:
+      - hadoop
+    ports:
+      - "8020:8020"
+    volumes:
+      - /home/manu/borges-pipeline/volumes/namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=my_cluster
+
+  datanode1:
+    image: uhopper/hadoop-datanode:2.7.2
+    hostname: datanode1
+    container_name: datanode1
+    domainname: hadoop
+    networks:
+      - hadoop
+    volumes:
+      - /home/manu/borges-pipeline/volumes/datanode1:/hadoop/dfs/data
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+    depends_on:
+      - "namenode"
+
+networks:
+  hadoop:

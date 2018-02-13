@@ -15,13 +15,16 @@ ROOT_REPOS_DIR ?= root-repositories
 ROOT_REPOS_TEMP_DIR ?= tmp/siva-copy
 NUM_WORKERS ?= 4
 
-.PHONY: up stop restart down hdfs-fail producer consumer gen-dirs hdfs-dirs
+.PHONY: up up-hdfs stop restart down hdfs-fail producer consumer gen-dirs hdfs-dirs
 
 gen-dirs:
 	mkdir -p volumes/{namenode,datanode1,postgres} tmp
 
 up: gen-dirs
 	$(DOCKER_COMPOSE) up -d
+
+up-hdfs:
+	$(DOCKER_COMPOSE) up namenode datanode1
 
 stop:
 	$(DOCKER_COMPOSE) stop
